@@ -19,16 +19,21 @@ LIMIT 25;
 --Which team has finished in last place in its division (i.e. with the least number of wins) the most number of times? 
 --A team's division is indicated by the divid column in the teams table.
 
-WITH ranked_teams AS(
-	SELECT 
-    	teamid,
-    	divid,
-    	w,
-    	yearid,
-    	DENSE_RANK() OVER(PARTITION BY divid, yearid ORDER BY w DESC) AS franchise_rank
-	FROM teams
+WITH ranked_teams AS (
+    SELECT 
+        teamid,
+        divid,
+        w,
+        yearid,
+        DENSE_RANK() OVER(PARTITION BY lgid, divid, yearid ORDER BY w) AS team_rank
+    FROM teams
 )
 
+SELECT teamid, COUNT(teamid) AS Count
+FROM ranked_teams rt
+WHERE team_rank = 1
+GROUP BY teamid
+ORDER BY COUNT(teamid) DESC
 
 
 
@@ -36,12 +41,3 @@ WITH ranked_teams AS(
 
 
 
-
-
-
-
-
-
-
-SELECT *
-FROM teams
